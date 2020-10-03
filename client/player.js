@@ -77,7 +77,7 @@ class Player {
 	render() {
 		var data = this.getData();
 		var anim = playerAnimations[data.currentState];
-		var color = playerColors[data.color];
+		var color = playerColors[data.color % playerColors.length];
 
 		if (color) {
 			tint(color[0], color[1], color[2]);
@@ -155,12 +155,6 @@ class LocalPlayer extends Player {
 			if (data.state != "idle") {
 				this.room.send("state", "idle");
 			}
-		}
-
-		if (data.color == -1) {
-			this.room.send("setup", {
-				color: Math.floor(Math.random() * playerColors.length)
-			});
 		}
 	}
 }

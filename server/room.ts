@@ -20,6 +20,19 @@ process.on('SIGUSR1', saveData.bind(null, {exit: true}));
 process.on('SIGUSR2', saveData.bind(null, {exit: true}));
 process.on('uncaughtException', saveData.bind(null, {exit: true}));
 
+function hashCode(str: string) {
+	var hash = 0;
+	var chr;
+
+	for (var i = 0; i < str.length; i++) {
+		chr = str.charCodeAt(i);
+		hash = ((hash << 5) - hash) + chr;
+		hash |= 0;
+	}
+
+	return hash;
+}
+
 class Player extends Schema {
 	@type("number") x: number;
 	@type("number") y: number;
@@ -34,8 +47,8 @@ class Player extends Schema {
 		this.x = 64;
 		this.y = 64;
 		this.message = null;
-		this.color = -1;
-		this.name = "test";
+		this.name = "nou";
+		this.color = hashCode(this.name);
 		this.currentState = "idle";
 	}
 }
@@ -102,7 +115,7 @@ export class GameRoom extends Room {
 			message = filter.clean(message);
 
 			var player = this.state.players[client.sessionId];
-			var dt = [ player.x, player.y, player.name, message ];
+			var dt = [ player.x, player.y, player.name, message, hashCode(player.name) ];
 
 			data.push(dt);
 
