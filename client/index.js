@@ -3,6 +3,9 @@ var draw = () => {};
 var players = new Map();
 var playerArray = [];
 var room;
+var localPlayer;
+var cx = 0;
+var cy = 0;
 
 client.joinOrCreate('room').then(r => {
 	room = r;
@@ -14,7 +17,15 @@ client.joinOrCreate('room').then(r => {
 
 	room.state.players.onAdd = function(player, sessionId) {
 		console.log("Player added", sessionId);
-		var player = sessionId == room.sessionId ? new LocalPlayer(sessionId, room) : new Player(sessionId, room);
+
+		var local = sessionId == room.sessionId;
+		var player = local ? new LocalPlayer(sessionId, room) : new Player(sessionId, room);
+
+		if (local) {
+			localPlayer = player;
+			cx = player.x;
+			cy = player.y;
+		}
 
 		players.set(sessionId, player);
 		playerArray.push(player);
@@ -86,8 +97,29 @@ function keyPressed() {
 function setupDraw() {
 	draw = () => {
 		update();
+
+		translate(width * 0.5, height * 0.5)
+
 		background(0);
 		scale(4);
+
+		if (localPlayer) {
+			var dx = localPlayer.x - cx;
+			var dy = localPlayer.y - cy;
+			var d = Math.sqrt(dx * dx + dy * dy);
+
+			if (d > 32) {
+				cx = dx;
+				cy = dy;
+			} else if (d > 1) {
+				var s = deltaTime * 5;
+			
+				cx += (dx) * s;
+				cy += (dy) * s;
+			}
+
+			translate(-cx - 4, -cy - 4);
+		}
 
 		if (room.data) {
 			stroke(0);

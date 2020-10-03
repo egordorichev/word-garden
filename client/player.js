@@ -114,19 +114,19 @@ class LocalPlayer extends Player {
 		var dy = 0;
 
 		if (!this.room.inputBlocked) {
-			if (keyIsDown(UP_ARROW)) {
+			if (keyIsDown(UP_ARROW) || keyIsDown(87)) {
 				dy = -1;
 			}
 
-			if (keyIsDown(DOWN_ARROW)) {
+			if (keyIsDown(DOWN_ARROW) || keyIsDown(83)) {
 				dy += 1;
 			}
 
-			if (keyIsDown(LEFT_ARROW)) {
+			if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) {
 				dx = -1;
 			}
 
-			if (keyIsDown(RIGHT_ARROW)) {
+			if (keyIsDown(RIGHT_ARROW) || keyIsDown(68)) {
 				dx += 1;
 			}
 		}

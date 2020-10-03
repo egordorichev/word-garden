@@ -4,7 +4,7 @@
 * global chat (show messages of everyone)
 * send message to chat when someone leaves/joins
 * show online count
-* following camera
 * some props or smth to make the world more interesting
 
 * world grid
+* save player positions
