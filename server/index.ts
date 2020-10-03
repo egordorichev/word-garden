@@ -1,3 +1,5 @@
+const HOST = "rexcellentgames.com"
+
 import http from "http";
 import express from "express";
 import cors from "cors";
@@ -22,4 +24,4 @@ gameServer.define('room', GameRoom);
 app.use("/colyseus", monitor());
 
 gameServer.listen(port);
-console.log(`Listening on ws://localhost:${ port }`)
+console.log(`Listening on ws://${HOST}:${port}`)

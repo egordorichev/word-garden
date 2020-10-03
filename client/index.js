@@ -1,6 +1,7 @@
 const SCALE = 4
+const HOST = "rexcellentgames.com"
 
-var client = new Colyseus.Client('ws://localhost:2567');
+var client = new Colyseus.Client(`ws://${HOST}:2567`);
 var draw = () => {};
 var players = new Map();
 var playerArray = [];
