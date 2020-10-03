@@ -4,17 +4,22 @@ import { Schema, MapSchema, type } from "@colyseus/schema";
 class Player extends Schema {
 	@type("number") x: number;
 	@type("number") y: number;
+	@type("number") color: number;
+	@type("string") message: string;
+	@type("string") currentState: string;
 
 	constructor() {
 		super();
 
-		this.x = 128;
-		this.y = 128;
+		this.x = 64;
+		this.y = 64;
+		this.message = null;
+		this.color = -1;
+		this.currentState = "idle";
 	}
 }
 
 class State extends Schema {
-	@type("string") currentTurn: string;
 	@type({ map: Player }) players = new MapSchema();
 }
 
@@ -27,6 +32,23 @@ export class GameRoom extends Room {
 			
 			player.x += message.x;
 			player.y += message.y;
+		});
+
+		this.onMessage("chat", (client, message) => {
+			var player = this.state.players[client.sessionId]
+			player.message = message;
+
+			console.log(`${client.sessionId}: ${message}`);
+		});
+
+		this.onMessage("state", (client, state) => {
+			var player = this.state.players[client.sessionId]
+			player.currentState = state;
+		});
+
+		this.onMessage("setup", (client, options) => {
+			var player = this.state.players[client.sessionId]
+			player.color = options.color;
 		});
 	}
 

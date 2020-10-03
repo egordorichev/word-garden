@@ -1,14 +1,7 @@
-window.onresize = function() {
-  var w = window.innerWidth;
-  var h = window.innerHeight;  
-  resizeCanvas(w, h);
-  width = w;
-  height = h;
-};
-
 var client = new Colyseus.Client('ws://localhost:2567');
 var draw = () => {};
 var players = new Map();
+var playerArray = [];
 var room;
 
 client.joinOrCreate('room').then(r => {
@@ -21,11 +14,16 @@ client.joinOrCreate('room').then(r => {
 
 	room.state.players.onAdd = function(player, sessionId) {
 		console.log("Player added", sessionId);
-		players.set(sessionId, sessionId == room.sessionId ? new LocalPlayer(sessionId, room) : new Player(sessionId, room));
+		var player = sessionId == room.sessionId ? new LocalPlayer(sessionId, room) : new Player(sessionId, room);
+
+		players.set(sessionId, player);
+		playerArray.push(player);
 	}
 
 	room.state.players.onRemove = function(player, sessionId) {
 		console.log("Player left", sessionId);
+
+		playerArray.splice(playerArray.indexOf(players.get(sessionId)), 1);
 		players.delete(sessionId);
 	}
 
@@ -56,9 +54,11 @@ function update() {
 
 	deltaTime /= 1000;
 
-	players.forEach((p) => {
+	playerArray.forEach((p) => {
 		p.update(deltaTime);
 	});
+
+	playerArray.sort((a, b) => a.y > b.y ? 1 : -1);
 }
 
 function setupDraw() {
@@ -67,8 +67,26 @@ function setupDraw() {
 		background(0, 0, 0);
 		scale(4);
 	
-		players.forEach((p) => {
+		playerArray.forEach((p) => {
 			p.render();
 		});
 	}
 }
+
+var input = document.getElementById("chat");
+var button = document.getElementById("send");
+
+input.addEventListener("keyup", (event) => {
+  if (event.keyCode === 13) {
+    event.preventDefault();
+    button.click();
+  }
+});
+
+button.addEventListener("click", () => {
+	if (room != undefined) {
+		room.send("chat", input.value);
+	}
+
+	input.value = "";
+});
