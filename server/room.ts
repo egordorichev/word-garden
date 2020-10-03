@@ -101,96 +101,127 @@ export class GameRoom extends Room {
 		this.setState(new State());
 
 		this.onMessage("move", (client, message) => {
-			var player = this.state.players[client.sessionId]
-			
-			player.x += message.x;
-			player.y += message.y;
+			try {
+				var player = this.state.players[client.sessionId]
+				
+				player.x += message.x;
+				player.y += message.y;
+			} catch (e) {
+				console.log(e)
+			}
 		});
 
 		this.onMessage("chat", (client, message) => {
-			var player = this.state.players[client.sessionId]
-			player.message = message;
+			try {
+				if (typeof message !== "string" || !/\S/.test(message)) {
+					return;
+				}
 
-			console.log(`${player.name}: ${message}`);
-			say(this.state, `${player.name}: ${message}`, "regular");
+				var player = this.state.players[client.sessionId]
+				player.message = message;
+
+				console.log(`${player.name}: ${message}`);
+				say(this.state, `${player.name}: ${message}`, "regular");
+			} catch (e) {
+				console.log(e)
+			}
 		});
 
 		this.onMessage("state", (client, state) => {
-			var player = this.state.players[client.sessionId]
-			player.currentState = state;
-		});
-
-		this.onMessage("setup", (client, options) => {
-			var player = this.state.players[client.sessionId]
-			player.color = options.color;
+			try {
+				var player = this.state.players[client.sessionId]
+				player.currentState = state;
+			} catch (e) {
+				console.log(e)
+			}
 		});
 
 		this.onMessage("fetch", (client, options) => {
-			var player = this.state.players[client.sessionId]
-			var d: Array<Array<number|string>> = []
-			var x = player.x;
-			var y = player.y;
+			try {
+				var player = this.state.players[client.sessionId]
+				var d: Array<Array<number|string>> = []
+				var x = player.x;
+				var y = player.y;
 
-			data.text.forEach((dt: Array<number|string>) => {
-				if (closeEnough(dt, x, y)) {
-					d.push(dt);
+				data.text.forEach((dt: Array<number|string>) => {
+					if (closeEnough(dt, x, y)) {
+						d.push(dt);
+					}
+				});
+
+				if (d.length > 32) {
+					d = d.slice(d.length - 33, d.length - 1);
 				}
-			});
 
-			client.send("data", d);
+				client.send("data", d);
+			} catch (e) {
+				console.log(e)
+			}
 		});
 
 		this.onMessage("message", (client, message) => {
-			if (!message || message.length == 0 || message.length > 256) {
-				return;
-			}
-
-			message = filter.clean(message);
-
-			var player = this.state.players[client.sessionId];
-			var dt = [ player.x + 4, player.y + 4, player.name, message, hashCode(player.name) ];
-
-			data.text.push(dt);
-
-			this.clients.forEach(c => {
-				player = this.state.players[client.sessionId];
-
-				if (closeEnough(dt, player.x + 4, player.y + 4)) {
-					c.send("add_data", dt);
+			try {
+				if (!message || typeof message !== "string" || !/\S/.test(message) || message.length > 256) {
+					return;
 				}
-			});
 
-			saveData();
+				try {
+					message = filter.clean(message);
+				} catch (e) {
+					console.log(e)
+				}
+
+				var player = this.state.players[client.sessionId];
+				var dt = [ player.x + 4, player.y + 4, player.name, message, hashCode(player.name) ];
+
+				data.text.push(dt);
+
+				this.clients.forEach(c => {
+					player = this.state.players[client.sessionId];
+
+					if (closeEnough(dt, player.x + 4, player.y + 4)) {
+						c.send("add_data", dt);
+					}
+				});
+
+				saveData();
+			} catch (e) {
+				console.log(e)
+			}	
 		});
 
 		this.onMessage("create", (client, name) => {
-			if (this.state.players[client.sessionId]) {
-				return;
+			try {
+				if (this.state.players[client.sessionId] || typeof name !== "string") {
+					return;
+				}
+
+				var p = new Player(name);
+				this.state.players[client.sessionId] = p;
+
+				var position = data.positions[name];
+
+				if (position) {
+					p.x = position[0];
+					p.y = position[1];
+				}
+
+				say(this.state, `${name} joined`, "server");
+			} catch (e) {
+				console.log(e)
 			}
-
-			var p = new Player(name);
-			this.state.players[client.sessionId] = p;
-
-			var position = data.positions[name];
-
-			if (position) {
-				p.x = position[0];
-				p.y = position[1];
-			}
-
-			say(this.state, `${name} joined`, "server");
 		});
 	}
 
-	onJoin(client: Client) {
-		
-	}
-
 	onLeave(client: Client) {
-		var p = this.state.players[client.sessionId];
-		data.positions[p.name] = [ p.x, p.y ];
-		say(this.state, `${p.name} left`, "server");
+		try {
+			var p = this.state.players[client.sessionId];
+			data.positions[p.name] = [ p.x, p.y ];
+			say(this.state, `${p.name} left`, "server");
 
-		delete this.state.players[client.sessionId];
+			delete this.state.players[client.sessionId];
+		} catch (e) {
+			console.log(e)
+		}
 	}
 }

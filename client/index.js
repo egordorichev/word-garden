@@ -1,5 +1,5 @@
 const SCALE = 4
-const HOST = "rexcellentgames.com"
+const HOST = "localhost"
 
 var client = new Colyseus.Client(`ws://${HOST}:2567`);
 var draw = () => {};
@@ -102,7 +102,7 @@ function keyPressed() {
 		if (keyCode == 84 || keyCode == 191) {
 			setTimeout(() => {
 				input.focus();
-			}, 0.01);
+			}, 1);
 		} else if (keyCode == 32) {
 			setModalEnabled(true);
 		}
@@ -253,7 +253,7 @@ button.addEventListener("click", () => {
 		return;
 	}
 
-	if (room != undefined && input.value.length > 0 && input.value.length <= 256) {
+	if (room != undefined && /\S/.test(input.value) > 0 && input.value.length <= 256) {
 		room.send("chat", input.value);
 	}
 
@@ -294,7 +294,7 @@ leaveMessage.addEventListener("click", () => {
 		return;
 	}
 
-	if (room != undefined && messsageArea.value.length > 0 && messsageArea.value.length <= 256) {
+	if (room != undefined && /\S/.test(messsageArea.value) && messsageArea.value.length <= 256) {
 		room.send("message", messsageArea.value);
 	}
 

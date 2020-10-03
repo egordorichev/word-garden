@@ -53,7 +53,7 @@ if (name != null && name != "null") {
 	var join = document.getElementById("join")
 
 	join.addEventListener("click", () => {
-		if (input.value.length != 0) {
+		if (/\S/.test(input.value) && input.value.length < 32) {
 			setCookie("name", input.value);
 
 			document.getElementById("chat-container").classList.remove("hidden")

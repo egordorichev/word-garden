@@ -1,4 +1,4 @@
-const HOST = "rexcellentgames.com"
+const HOST = "localhost"
 
 import http from "http";
 import express from "express";
