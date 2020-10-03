@@ -42,6 +42,7 @@ client.joinOrCreate('room').then(r => {
 
 	room.onMessage("data", data => {
 		room.data = data;
+		console.log(data);
 	});
 
 	room.onMessage("add_data", message => {
@@ -55,6 +56,15 @@ client.joinOrCreate('room').then(r => {
 	setupDraw();
 }).catch(e => {
 	console.log(e);
+	draw = () => {
+		background(0);
+		fill(255);
+		noStroke();
+		textSize(16);
+		textStyle(NORMAL);
+		textAlign(LEFT, TOP);
+		text("Failed to connect to the server", 10, 10);
+	};
 });
 
 var canvas
@@ -248,15 +258,15 @@ var messsageArea = document.getElementById("message");
 var leaveMessage = document.getElementById("leave");
 var cancel = document.getElementById("cancel");
 
-function trim() {
+function ttrim() {
 	if (messsageArea.value.length > 256) {
 		messsageArea.value = messsageArea.value.substring(0, 256);
 	}
 }
 
-messsageArea.addEventListener("input", trim);
-messsageArea.addEventListener("paste", trim);
-messsageArea.addEventListener("change", trim);
+messsageArea.addEventListener("input", ttrim);
+messsageArea.addEventListener("paste", ttrim);
+messsageArea.addEventListener("change", ttrim);
 
 leaveMessage.addEventListener("click", () => {
 	if (!room.inputBlocked) {

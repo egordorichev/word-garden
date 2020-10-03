@@ -61,7 +61,7 @@ function closeEnough(dt: Array<number|string>, x: number, y: number) {
 	var dx = <number> dt[0] - x;
 	var dy = <number> dt[1] - y;
 
-	return dx * dx + dy * dy <= 2000 * 2000;
+	return dx * dx + dy * dy <= 300 * 300;
 }
 
 export class GameRoom extends Room {
