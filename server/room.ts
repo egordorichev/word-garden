@@ -44,6 +44,8 @@ class Player extends Schema {
 	constructor(name: string) {
 		super();
 
+		name = name.substring(0, 32);
+
 		this.x = Math.random() * 64 - 32;
 		this.y = Math.random() * 64 - 32;
 		this.message = null;
@@ -98,7 +100,7 @@ export class GameRoom extends Room {
 			var x = player.x;
 			var y = player.y;
 
-			data.forEach((dt: Array<number|string>) => {
+			data.text.forEach((dt: Array<number|string>) => {
 				if (closeEnough(dt, x, y)) {
 					d.push(dt);
 				}
@@ -115,14 +117,14 @@ export class GameRoom extends Room {
 			message = filter.clean(message);
 
 			var player = this.state.players[client.sessionId];
-			var dt = [ player.x, player.y, player.name, message, hashCode(player.name) ];
+			var dt = [ player.x + 4, player.y + 4, player.name, message, hashCode(player.name) ];
 
-			data.push(dt);
+			data.text.push(dt);
 
 			this.clients.forEach(c => {
 				player = this.state.players[client.sessionId];
 
-				if (closeEnough(dt, player.x, player.y)) {
+				if (closeEnough(dt, player.x + 4, player.y + 4)) {
 					c.send("add_data", dt);
 				}
 			});
@@ -135,7 +137,15 @@ export class GameRoom extends Room {
 				return;
 			}
 
-			this.state.players[client.sessionId] = new Player(name);
+			var p = new Player(name);
+			this.state.players[client.sessionId] = p;
+
+			var position = data.positions[name];
+
+			if (position) {
+				p.x = position[0];
+				p.y = position[1];
+			}
 		});
 	}
 
@@ -144,6 +154,9 @@ export class GameRoom extends Room {
 	}
 
 	onLeave(client: Client) {
+		var p = this.state.players[client.sessionId];
+		data.positions[p.name] = [ p.x, p.y ];
+
 		delete this.state.players[client.sessionId];
 	}
 }

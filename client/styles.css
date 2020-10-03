@@ -1,6 +1,7 @@
 * {
 	margin: 0;
 	padding: 0;
+	color: white;
 }
 
 html, body {
@@ -172,4 +173,9 @@ h3 {
 
 #overlay-message {
 	height: 100%;
+}
+
+#controls {
+	font-family: 'Sansita Swashed', cursive;
+	color: #bbb;
 }

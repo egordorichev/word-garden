@@ -151,7 +151,7 @@ function setupDraw() {
 
 		if (room.data) {
 			stroke(0);
-			strokeWeight(4);
+			strokeWeight(3);
 
 			room.data.forEach((d) => {
 				var x = d[0]
@@ -196,9 +196,16 @@ function setupDraw() {
 
 		pop();
 		fill(100)
+		strokeWeight(10);
+		stroke(0);
 		textSize(16)
 		textAlign(LEFT, TOP)
 		text(`${playerArray.length} online`, 10, 10)
+
+		if (localPlayer) {
+			fill(80)
+			text(`${Math.floor(localPlayer.x / 32)}:${Math.floor(localPlayer.y / 32)}`, 10, 30)
+		}
 	}
 }
 

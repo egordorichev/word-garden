@@ -93,9 +93,11 @@ class Player {
 
 		if (this.message) {
 			fill(255);
+			stroke(0);
+			strokeWeight(4);
 			textSize(6);
 			textAlign(CENTER, BOTTOM);
-			text(data.message, this.x + 4 - 16, this.y - 2, 32);
+			text(data.message, this.x + 4, this.y - 2);
 		}
 	}
 }
