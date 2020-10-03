@@ -1,9 +1,3 @@
-var canvas
-
-function setup() {
-	canvas = createCanvas(window.innerWidth, window.innerHeight);
-}
-
 window.onresize = function() {
   var w = window.innerWidth;
   var h = window.innerHeight;  
@@ -14,7 +8,7 @@ window.onresize = function() {
 
 var client = new Colyseus.Client('ws://localhost:2567');
 var draw = () => {};
-var players = [];
+var players = new Map();
 var room;
 
 client.joinOrCreate('room').then(r => {
@@ -27,33 +21,33 @@ client.joinOrCreate('room').then(r => {
 
 	room.state.players.onAdd = function(player, sessionId) {
 		console.log("Player added", sessionId);
-		players.push(sessionId);
+		players.set(sessionId, sessionId == room.sessionId ? new LocalPlayer(sessionId, room) : new Player(sessionId, room));
 	}
 
 	room.state.players.onRemove = function(player, sessionId) {
 		console.log("Player left", sessionId);
-	  array.splice(array.indexOf(sessionId), 1);
+		players.delete(sessionId);
 	}
 
-	room.state.players.onChange = function(player, sessionId) {
-
-	}
-
-	draw = () => {
-		update();
-
-		background(0, 0, 0);
-	
-		fill(255);
-	
-		players.forEach((id) => {
-			var p = room.state.players[id];
-			circle(p.x, p.y, 10);
-		});
-	}
+	setupDraw();
 }).catch(e => {
 	console.log(e);
 });
+
+var canvas
+var assets = {}
+
+function setup() {
+	canvas = createCanvas(window.innerWidth, window.innerHeight);
+
+	let context = canvas.elt.getContext('2d');
+	context.mozImageSmoothingEnabled = false;
+	context.webkitImageSmoothingEnabled = false;
+	context.msImageSmoothingEnabled = false;
+	context.imageSmoothingEnabled = false;
+
+	assets["player"] = loadImage("assets/player.png");
+}
 
 function update() {
 	if (room == undefined) {
@@ -62,7 +56,19 @@ function update() {
 
 	deltaTime /= 1000;
 
-	if (keyIsDown(UP_ARROW)) {
-		room.send("move", { y: -deltaTime * 10 });
+	players.forEach((p) => {
+		p.update(deltaTime);
+	});
+}
+
+function setupDraw() {
+	draw = () => {
+		update();
+		background(0, 0, 0);
+		scale(4);
+	
+		players.forEach((p) => {
+			p.render();
+		});
 	}
 }

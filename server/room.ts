@@ -23,9 +23,10 @@ export class GameRoom extends Room {
 		this.setState(new State());
 
 		this.onMessage("move", (client, message) => {
-			console.log(message.y)
-			this.state.players[client.sessionId].y += message.y;
-			console.log(this.state.players[client.sessionId].y)
+			var player = this.state.players[client.sessionId]
+			
+			player.x += message.x;
+			player.y += message.y;
 		});
 	}
 
