@@ -41,13 +41,13 @@ class Player extends Schema {
 	@type("string") name: string;
 	@type("string") currentState: string;
 
-	constructor() {
+	constructor(name: string) {
 		super();
 
-		this.x = 64;
-		this.y = 64;
+		this.x = Math.random() * 64 - 32;
+		this.y = Math.random() * 64 - 32;
 		this.message = null;
-		this.name = "nou";
+		this.name = name;
 		this.color = hashCode(this.name);
 		this.currentState = "idle";
 	}
@@ -129,11 +129,18 @@ export class GameRoom extends Room {
 
 			saveData();
 		});
+
+		this.onMessage("create", (client, name) => {
+			if (this.state.players[client.sessionId]) {
+				return;
+			}
+
+			this.state.players[client.sessionId] = new Player(name);
+		});
 	}
 
 	onJoin(client: Client) {
-		var p = new Player();
-		this.state.players[client.sessionId] = p;
+
 	}
 
 	onLeave(client: Client) {

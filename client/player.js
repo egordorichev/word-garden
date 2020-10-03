@@ -24,6 +24,10 @@ const playerColors = [
 	[ 255, 119, 168 ] 
 ]
 
+function figureOutColor(a, n) {
+	return Math.floor(((a % n) + n) % n);
+}
+
 class Player {
 	constructor(id, room) {
 		this.id = id;
@@ -49,7 +53,7 @@ class Player {
 			this.x = data.x;
 			this.y = data.y;
 		} else if (d > 0.1) {
-			var s = dt * 20;
+			var s = dt * 25;
 
 			this.x += dx * s;
 			this.y += dy * s;
@@ -77,7 +81,7 @@ class Player {
 	render() {
 		var data = this.getData();
 		var anim = playerAnimations[data.currentState];
-		var color = playerColors[data.color % playerColors.length];
+		var color = playerColors[figureOutColor(data.color, playerColors.length)];
 
 		if (color) {
 			tint(color[0], color[1], color[2]);

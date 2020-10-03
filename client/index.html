@@ -4,8 +4,8 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>@egordorichev</title>
+	<link href="https://fonts.googleapis.com/css2?family=Sansita+Swashed&display=swap" rel="stylesheet">
 	<script type="text/javascript" src="https://raw.githack.com/colyseus/colyseus.js/master/dist/colyseus.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/p5@1.1.9/lib/p5.js"></script>
 	<script src="player.js"></script>
 	<link rel="stylesheet" href="styles.css"/>
 </head>
@@ -17,11 +17,22 @@
 
 	<div id="overlay" class="hidden">
 		<div id="modal">
-			<textarea id="message" placeholder="Message" maxlength="256"></textarea>
-			<button id="leave">Leave</button>
-			<button id="cancel">Cancel</button>
+			<div id="overlay-message">
+				<textarea id="message" placeholder="Message" maxlength="256"></textarea>
+				<button id="leave">Leave</button>
+				<button id="cancel">Cancel</button>
+			</div>
+			<div id="overlay-login" class="hidden">
+				<h1>Word Garden</h1>
+				<h3>By @egordorichev</h3>
+
+				<div id="nick-div">
+					<input id="nick" placeholder="Nick" maxlength="256"></input>
+					<button id="join">Join</button>
+				</div>
+			</div>
 		</div>
 	</div>
-	<script src="index.js"></script>
+	<script src="login.js"></script>
 </body>
 </html>

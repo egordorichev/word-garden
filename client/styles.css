@@ -124,7 +124,7 @@ button:hover {
 	height: calc(100% - 35px);
 }
 
-#leave, #cancel {
+#leave, #cancel, #join {
 	padding: 10px;
 	height: 30px;
 	box-sizing: border-box;
@@ -141,4 +141,35 @@ button:hover {
 
 #cancel:hover {
 	background-color: #191919;
+}
+
+#nick {
+	width: calc(100% - 110px);
+	border-radius: 5pt;
+}
+
+#join {
+	width: 100px;
+	float: right;
+	margin-top: 0;
+}
+
+h1 {
+	color: white;
+	font-family: 'Sansita Swashed', cursive;
+}
+
+h3 {
+	color: #777;
+	font-family: 'Sansita Swashed', cursive;
+}
+
+#nick-div {
+	bottom: 10px;
+	width: calc(100% - 30px);
+	position: absolute;
+}
+
+#overlay-message {
+	height: 100%;
 }

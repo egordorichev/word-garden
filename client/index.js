@@ -11,15 +11,13 @@ var cy = 0;
 
 client.joinOrCreate('room').then(r => {
 	room = r;
-	console.log(room.sessionId, "joined", room.name);
+	room.send("create", getCookie("name") || "undefined");
 
 	room.onError((code, message) => {
 		console.log(client.id, "couldn't join", room.name);
 	});
 
 	room.state.players.onAdd = function(player, sessionId) {
-		console.log("Player added", sessionId);
-
 		var local = sessionId == room.sessionId;
 		var player = local ? new LocalPlayer(sessionId, room) : new Player(sessionId, room);
 
@@ -34,15 +32,12 @@ client.joinOrCreate('room').then(r => {
 	}
 
 	room.state.players.onRemove = function(player, sessionId) {
-		console.log("Player left", sessionId);
-
 		playerArray.splice(playerArray.indexOf(players.get(sessionId)), 1);
 		players.delete(sessionId);
 	}
 
 	room.onMessage("data", data => {
 		room.data = data;
-		console.log(data);
 	});
 
 	room.onMessage("add_data", message => {
@@ -169,7 +164,7 @@ function setupDraw() {
 				var color = d[4]
 
 				if (color) {
-					color = playerColors[color % playerColors.length]
+					color = playerColors[figureOutColor(color, playerColors.length)]
 					fill(color[0], color[1], color[2]);
 				} else {
 					fill(255);
