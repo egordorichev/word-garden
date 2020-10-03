@@ -27,6 +27,18 @@ client.joinOrCreate('room').then(r => {
 		players.delete(sessionId);
 	}
 
+	room.onMessage("data", data => {
+		room.data = data;
+	});
+
+	room.onMessage("add_data", message => {
+		if (!room.data) {
+			room.data = [];
+		}
+
+		room.data.push(message);
+	});
+
 	setupDraw();
 }).catch(e => {
 	console.log(e);
@@ -47,6 +59,10 @@ function setup() {
 	assets["player"] = loadImage("assets/player.png");
 }
 
+window.onresize = () => {
+	resizeCanvas(window.innerWidth, window.innerHeight);
+}
+
 function update() {
 	if (room == undefined) {
 		return;
@@ -61,11 +77,33 @@ function update() {
 	playerArray.sort((a, b) => a.y > b.y ? 1 : -1);
 }
 
+function keyPressed() {
+	if (keyCode == 32 && room && !room.inputBlocked) {
+		setModalEnabled(true);
+	}
+}
+
 function setupDraw() {
 	draw = () => {
 		update();
-		background(0, 0, 0);
+		background(0);
 		scale(4);
+
+		if (room.data) {
+			stroke(0);
+			strokeWeight(4);
+
+			room.data.forEach((d) => {
+				fill(255);
+				textSize(4);
+				textAlign(CENTER, BOTTOM);
+				text(d[3], d[0] - 32, d[1] - 2, 64);
+				fill(200);
+				text(d[2], d[0] - 32, d[1] - 8, 64);
+			});
+
+			noStroke();
+		}
 	
 		playerArray.forEach((p) => {
 			p.render();
@@ -84,9 +122,55 @@ input.addEventListener("keyup", (event) => {
 });
 
 button.addEventListener("click", () => {
-	if (room != undefined) {
+	if (room.inputBlocked) {
+		return;
+	}
+
+	if (room != undefined && input.value.length > 0) {
 		room.send("chat", input.value);
 	}
 
 	input.value = "";
+});
+
+function setModalEnabled(enabled) {
+	room.inputBlocked = enabled;
+
+	var o = document.getElementById("overlay");
+	var c = canvas.elt;
+
+	if (enabled) {
+		o.classList.remove("hidden");
+		c.classList.add("blurred");
+	} else {
+		o.classList.add("hidden");
+		c.classList.remove("blurred");
+	}
+}
+
+var messsageArea = document.getElementById("message");
+var leaveMessage = document.getElementById("leave");
+var cancel = document.getElementById("cancel");
+
+leaveMessage.addEventListener("click", () => {
+	if (!room.inputBlocked) {
+		return;
+	}
+
+	if (room != undefined && messsageArea.value.length > 0) {
+		room.send("message", messsageArea.value);
+	}
+
+	messsageArea.value = "";
+	setModalEnabled(false);
+});
+
+cancel.addEventListener("click", () => {
+	if (!room.inputBlocked) {
+		return;
+	}
+
+
+	messsageArea.value = "";
+	setModalEnabled(false);
 });

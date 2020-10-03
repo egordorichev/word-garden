@@ -99,28 +99,36 @@ class Player {
 class LocalPlayer extends Player {
 	constructor(id, room) {
 		super(id, room);
+		this.timer = -1;
 	}
 
 	update(dt) {
+		if (this.timer == -1) {
+			room.send("fetch");
+			this.timer = 0;
+		}
+
 		super.update(dt);
 
 		var dx = 0;
 		var dy = 0;
 
-		if (keyIsDown(UP_ARROW)) {
-			dy = -1;
-		}
+		if (!this.room.inputBlocked) {
+			if (keyIsDown(UP_ARROW)) {
+				dy = -1;
+			}
 
-		if (keyIsDown(DOWN_ARROW)) {
-			dy += 1;
-		}
+			if (keyIsDown(DOWN_ARROW)) {
+				dy += 1;
+			}
 
-		if (keyIsDown(LEFT_ARROW)) {
-			dx = -1;
-		}
+			if (keyIsDown(LEFT_ARROW)) {
+				dx = -1;
+			}
 
-		if (keyIsDown(RIGHT_ARROW)) {
-			dx += 1;
+			if (keyIsDown(RIGHT_ARROW)) {
+				dx += 1;
+			}
 		}
 
 		var data = this.getData();
@@ -135,6 +143,13 @@ class LocalPlayer extends Player {
 
 			if (data.state != "run") {
 				this.room.send("state", "run");
+			}
+
+			this.timer += dt;
+
+			if (this.timer >= 2) {
+				this.timer = 0;
+				room.send("fetch");
 			}
 		} else {
 			if (data.state != "idle") {
