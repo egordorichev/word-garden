@@ -195,11 +195,29 @@ function setupDraw() {
 		});
 
 		pop();
-		fill(100)
-		strokeWeight(10);
+
+		strokeWeight(5);
 		stroke(0);
 		textSize(16)
 		textAlign(LEFT, TOP)
+		
+		fill(255);
+
+		for (var i = 0; i < room.state.chat.length; i++) {
+			var message = room.state.chat[i]
+
+			if (message.type != "regular") {
+				fill(playerColors[5]);
+			}
+
+			text(message.line, 10, height - (room.state.chat.length - i - 1) * 20 - 60);	
+
+			if (message.type != "regular") {
+				fill(255);
+			}
+		}
+
+		fill(100);
 		text(`${playerArray.length} online`, 10, 10)
 
 		if (localPlayer) {

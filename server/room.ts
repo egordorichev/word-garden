@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 import { Room, Client } from "colyseus";
-import { Schema, MapSchema, type } from "@colyseus/schema";
+import { Schema, ArraySchema, MapSchema, type } from "@colyseus/schema";
 
 const Filter = require('bad-words');
 const filter = new Filter();
@@ -55,8 +55,21 @@ class Player extends Schema {
 	}
 }
 
+class ChatLine extends Schema {
+	@type("string") line: string;
+	@type("string") type: string;
+
+	constructor(line: string, type: string) {
+		super();
+
+		this.line = line;
+		this.type = type;
+	}
+}
+
 class State extends Schema {
 	@type({ map: Player }) players = new MapSchema();
+	@type([ ChatLine ]) chat = new ArraySchema<ChatLine>();
 }
 
 function closeEnough(dt: Array<number|string>, x: number, y: number) {
@@ -64,6 +77,23 @@ function closeEnough(dt: Array<number|string>, x: number, y: number) {
 	var dy = <number> dt[1] - y;
 
 	return dx * dx + dy * dy <= 300 * 300;
+}
+
+function say(state: State, message: string, type: string) {
+	state.chat.push(new ChatLine(message, type));
+
+	if (state.chat.length > 5) {
+		state.chat.splice(0, 1);	
+	}
+
+	setTimeout(() => {
+		for (var i = 0; i < state.chat.length; i++) {
+			if(state.chat[i].line == message) {
+				state.chat.splice(i, 1);
+				break;
+			}
+		}
+	}, 10000)
 }
 
 export class GameRoom extends Room {
@@ -81,7 +111,8 @@ export class GameRoom extends Room {
 			var player = this.state.players[client.sessionId]
 			player.message = message;
 
-			console.log(`${client.sessionId}: ${message}`);
+			console.log(`${player.name}: ${message}`);
+			say(this.state, `${player.name}: ${message}`, "regular");
 		});
 
 		this.onMessage("state", (client, state) => {
@@ -146,16 +177,19 @@ export class GameRoom extends Room {
 				p.x = position[0];
 				p.y = position[1];
 			}
+
+			say(this.state, `${name} joined`, "server");
 		});
 	}
 
 	onJoin(client: Client) {
-
+		
 	}
 
 	onLeave(client: Client) {
 		var p = this.state.players[client.sessionId];
 		data.positions[p.name] = [ p.x, p.y ];
+		say(this.state, `${p.name} left`, "server");
 
 		delete this.state.players[client.sessionId];
 	}
