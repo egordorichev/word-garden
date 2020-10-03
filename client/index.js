@@ -107,6 +107,7 @@ function setupDraw() {
 	draw = () => {
 		update();
 
+		push();
 		translate(width * 0.5, height * 0.5)
 
 		background(0);
@@ -181,8 +182,18 @@ function setupDraw() {
 		}
 	
 		playerArray.forEach((p) => {
+			if (Math.abs(p.x - cx) > width / SCALE * 0.75 || Math.abs(p.y - cy) > height / SCALE * 0.75) {
+				return
+			}
+
 			p.render();
 		});
+
+		pop();
+		fill(100)
+		textSize(16)
+		textAlign(LEFT, TOP)
+		text(`${playerArray.length} online`, 10, 10)
 	}
 }
 
