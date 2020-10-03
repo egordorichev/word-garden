@@ -3,6 +3,9 @@ const fs = require('fs');
 import { Room, Client } from "colyseus";
 import { Schema, MapSchema, type } from "@colyseus/schema";
 
+const Filter = require('bad-words');
+const filter = new Filter();
+
 const dataPath = 'data/data.json';
 
 var data = JSON.parse(fs.readFileSync(dataPath));
@@ -92,9 +95,11 @@ export class GameRoom extends Room {
 		});
 
 		this.onMessage("message", (client, message) => {
-			if (!message || message.length == 0) {
+			if (!message || message.length == 0 || message.length > 256) {
 				return;
 			}
+
+			message = filter.clean(message);
 
 			var player = this.state.players[client.sessionId];
 			var dt = [ player.x, player.y, player.name, message ];

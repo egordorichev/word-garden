@@ -126,7 +126,7 @@ button.addEventListener("click", () => {
 		return;
 	}
 
-	if (room != undefined && input.value.length > 0) {
+	if (room != undefined && input.value.length > 0 && input.value.length <= 256) {
 		room.send("chat", input.value);
 	}
 
@@ -152,12 +152,22 @@ var messsageArea = document.getElementById("message");
 var leaveMessage = document.getElementById("leave");
 var cancel = document.getElementById("cancel");
 
+function trim() {
+	if (messsageArea.value.length > 256) {
+		messsageArea.value = messsageArea.value.substring(0, 256);
+	}
+}
+
+messsageArea.addEventListener("input", trim);
+messsageArea.addEventListener("paste", trim);
+messsageArea.addEventListener("change", trim);
+
 leaveMessage.addEventListener("click", () => {
 	if (!room.inputBlocked) {
 		return;
 	}
 
-	if (room != undefined && messsageArea.value.length > 0) {
+	if (room != undefined && messsageArea.value.length > 0 && messsageArea.value.length <= 256) {
 		room.send("message", messsageArea.value);
 	}
 
