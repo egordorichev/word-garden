@@ -26,29 +26,20 @@ const messages = [
 	"baguette"
 ]
 
-class Man {
+class Npc {
 	constructor() {
 		this.x = 0
 		this.y = 0
 		this.time = 0
 		this.closeEnough = false
 		this.text = ""
-		this.understood = false
 		this.step = 0;
+		this.sprite = "player"
+		this.messages = []
 	}
 
-	sayNext() {
-		this.step++;
+	start() {
 
-		if (this.step <= messages.length) {
-			this.say(messages[this.step - 1]);
-			return;
-		}
-
-		localPlayer.talking = false;
-		man = null;
-		document.getElementById("chat-container").classList.remove("hidden");
-		setCookie("man", "baguette");
 	}
 
 	update(dt) {
@@ -56,10 +47,6 @@ class Man {
 
 		if (!localPlayer) {
 			return;
-		} else if (!this.set) {
-			this.x = localPlayer.x - 4
-			this.y = localPlayer.y - 30
-			this.set = true
 		}
 
 		if (this.closeEnough) {
@@ -82,15 +69,28 @@ class Man {
 			this.closeEnough = true
 			localPlayer.talking = true
 
-			this.say(`Hello, ${localPlayer.getData().name}!`)
+			this.start()
+		}
+	}
 
-			setTimeout(() => {
-				if (this.understood) {
-					return;
-				}
+	render() {
+		colorMode(HSB)
+		tint(this.time * 100 % 360, 100, 100);
+		image(assets[this.sprite], this.x, this.y, 8, 8, (Math.floor(this.time * 7) % 5) * 8, 0, 8, 8);
+		colorMode(RGB)
 
-				this.say("(Press SPACE to continue)")
-			}, 5000);
+		if (this.closeEnough) {
+			textSize(4);
+			textAlign(CENTER, BOTTOM);
+			
+			var w = textWidth(this.text)
+			
+			fill(0, 0, 0, 150);
+			rect(this.x + 4 - w * 0.5, this.y - 3 - 3, w, 4)
+
+			fill(255, 255, 255, 255);
+			
+			text(this.text, this.x + 4, this.y - 2)
 		}
 	}
 
@@ -116,24 +116,59 @@ class Man {
 		}, str.length * 70);
 	}
 
-	render() {
-		colorMode(HSB)
-		tint(this.time * 100 % 360, 100, 100);
-		image(assets["man"], this.x, this.y, 8, 8, (Math.floor(this.time * 7) % 5) * 8, 0, 8, 8);
-		colorMode(RGB)
+	sayNext() {
+		this.step++;
 
-		if (this.closeEnough) {
-			textSize(4);
-			textAlign(CENTER, BOTTOM);
-			
-			var w = textWidth(this.text)
-			
-			fill(0, 0, 0, 150);
-			rect(this.x + 4 - w * 0.5, this.y - 3 - 3, w, 4)
+		if (this.step <= this.messages.length) {
+			this.say(this.messages[this.step - 1]);
+			return;
+		}
 
-			fill(255, 255, 255, 255);
-			
-			text(this.text, this.x + 4, this.y - 2)
+		localPlayer.talking = false;
+		this.finishTalking();
+	}
+
+	finishTalking() {
+
+	}
+}
+
+class Man extends Npc {
+	constructor() {
+		super()
+
+		this.messages = messages
+		this.understood = false
+		this.sprite = "man"
+	}
+
+	finishTalking() {
+		man = null;
+		document.getElementById("chat-container").classList.remove("hidden");
+		setCookie("man", "baguette");
+	}
+
+	start() {
+		this.say(`Hello, ${localPlayer.getData().name}!`)
+
+		setTimeout(() => {
+			if (this.understood) {
+				return;
+			}
+
+			this.say("(Press SPACE to continue)")
+		}, 5000);
+	}
+
+	update(dt) {
+		super.update(dt)
+
+		if (!localPlayer) {
+			return;
+		} else if (!this.set) {
+			this.x = localPlayer.x - 4
+			this.y = localPlayer.y - 30
+			this.set = true
 		}
 	}
 }

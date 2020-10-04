@@ -47,7 +47,7 @@ function setupConnect(r) {
 			cx = player.x;
 			cy = player.y;
 
-			if (getCookie("man") != "baguette") {
+			if (false && getCookie("man") != "baguette") {
 				document.getElementById("chat-container").classList.add("hidden");
 
 				man = new Man();
@@ -94,7 +94,7 @@ function setupConnect(r) {
 	setupDraw();
 }
 
-function tryConnect() {
+tryConnect = () => {
 	document.getElementById("chat-container").classList.add("hidden");
 	client.joinOrCreate('room').then(setupConnect).catch(failConnect);
 }
@@ -116,7 +116,7 @@ function failConnect(e) {
 	setTimeout(tryConnect, 1000);
 }
 
-tryConnect();
+// tryConnect();
 
 var assets = {}
 

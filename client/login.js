@@ -36,9 +36,12 @@ function loadScript(name) {
 }
 
 var name = getCookie("name")
+var tryConnect;
 
 function loadLibs() {
-	loadScript("index.js");
+	setTimeout(() => {
+		tryConnect();
+	}, 1)
 }
 
 if (name != null && name != "null") {
@@ -49,10 +52,11 @@ if (name != null && name != "null") {
 	document.getElementById("overlay-login").classList.remove("hidden")
 	document.getElementById("overlay-message").classList.add("hidden")
 
-	var input = document.getElementById("nick")
-	var jjoin = document.getElementById("join")
+	let input = document.getElementById("nick")
+	let jjoin = document.getElementById("join")
 
 	jjoin.addEventListener("click", () => {
+		console.log(input.value)
 		if (/\S/.test(input.value) && input.value.length < 32) {
 			setCookie("name", input.value);
 

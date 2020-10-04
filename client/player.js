@@ -124,8 +124,10 @@ class Player {
 		resetMatrix();
 		scale(SCALE);
 		
+		if (localPlayer != null) {
 		translate(-localPlayer.x + this.x + width / SCALE / 2, -localPlayer.y + this.y + height / SCALE / 2)
-	
+		}
+
 		rotate(this.angle);
 		scale(this.sx, this.sy);
 		image(assets["player"], -4, -4, 8, 8, (Math.floor((this.time * 10) % anim.len) + anim.start) * 8, 0, 8, 8);

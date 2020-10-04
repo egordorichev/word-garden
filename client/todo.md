@@ -3,5 +3,6 @@
 	* baguette npc (literal baguette)
 }
 
+* game isnt working on the first load
 * minify js before posting
 * juice, particles etc
