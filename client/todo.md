@@ -3,8 +3,6 @@
 * music / sfx?
 * juice, particles etc
 
-* BAD WORD FILTER ON CHAT / username
-
 * optimization: change key state change rather than package every frame
 * limit somehow the amount of messages you can post
 

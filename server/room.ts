@@ -117,6 +117,12 @@ export class GameRoom extends Room {
 					return;
 				}
 
+				try {
+					message = filter.clean(message);
+				} catch (e) {
+					console.log(e)
+				}
+
 				var player = this.state.players[client.sessionId]
 				player.message = message;
 
@@ -194,6 +200,12 @@ export class GameRoom extends Room {
 			try {
 				if (this.state.players[client.sessionId] || typeof name !== "string") {
 					return;
+				}
+
+				try {
+					name = filter.clean(name);
+				} catch (e) {
+					console.log(e)
 				}
 
 				var p = new Player(name);
