@@ -98,11 +98,16 @@ class Man {
 		this.text = ""
 		this.doneSaying = false;
 
-		for (var i = 0; i < str.length; i++) {
+		for (let i = 0; i < str.length; i++) {
 			let c = str.charAt(i);
 
 			setTimeout(() => {
 				this.text += c
+
+				if (i % 2 == 0) {
+					assets["talk"].stop();
+					assets["talk"].play(0, Math.max(0.5, Math.min(2, ((c.charCodeAt(0) - 'a'.charCodeAt(0)) / 26) * 1.5) - 0.2));
+				}
 			}, i * 70);
 		}
 

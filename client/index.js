@@ -120,6 +120,11 @@ tryConnect();
 
 var assets = {}
 
+function preload() {
+	soundFormats('wav');
+	assets["talk"] = loadSound("assets/talk.wav");
+}
+
 function setup() {
 	canvas = createCanvas(window.innerWidth, window.innerHeight);
 
@@ -134,7 +139,9 @@ function setup() {
 }
 
 window.onresize = () => {
-	resizeCanvas(window.innerWidth, window.innerHeight);
+	if (typeof resizeCanvas !== 'undefined') {
+		resizeCanvas(window.innerWidth, window.innerHeight);
+	}
 }
 
 function update() {

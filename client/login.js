@@ -1,5 +1,3 @@
-const P5JS_LINK = "https://cdn.jsdelivr.net/npm/p5@1.1.9/lib/p5.js"
-
 function setCookie(name, value, days) {
 	var expires = "";
 
@@ -39,9 +37,12 @@ function loadScript(name) {
 
 var name = getCookie("name")
 
-if (name != null && name != "null") {
-	loadScript(P5JS_LINK);
+function loadLibs() {
 	loadScript("index.js");
+}
+
+if (name != null && name != "null") {
+	loadLibs();
 } else {
 	document.getElementById("chat-container").classList.add("hidden")
 	document.getElementById("overlay").classList.remove("hidden")
@@ -60,8 +61,7 @@ if (name != null && name != "null") {
 			document.getElementById("overlay-login").classList.add("hidden")
 			document.getElementById("overlay-message").classList.remove("hidden")
 
-			loadScript(P5JS_LINK);
-			loadScript("index.js");
+			loadLibs();
 			return;
 		}
 	});
