@@ -46,8 +46,8 @@ class Player extends Schema {
 
 		name = name.substring(0, 32);
 
-		this.x = Math.random() * 64 - 32;
-		this.y = Math.random() * 64 - 32;
+		this.x = Math.random() * 128 - 64;
+		this.y = Math.random() * 128 - 64;
 		this.message = null;
 		this.name = name;
 		this.color = hashCode(this.name);

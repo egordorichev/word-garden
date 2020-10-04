@@ -63,13 +63,12 @@ client.joinOrCreate('room').then(r => {
 	};
 });
 
-var canvas
 var assets = {}
 
 function setup() {
 	canvas = createCanvas(window.innerWidth, window.innerHeight);
 
-	let context = canvas.elt.getContext('2d');
+	context = canvas.elt.getContext('2d');
 	context.mozImageSmoothingEnabled = false;
 	context.webkitImageSmoothingEnabled = false;
 	context.msImageSmoothingEnabled = false;
@@ -120,7 +119,7 @@ function setupDraw() {
 		scale(SCALE);
 
 		if (localPlayer) {
-			var dx = localPlayer.x - cx;
+			/*var dx = localPlayer.x - cx;
 			var dy = localPlayer.y - cy;
 			var d = Math.sqrt(dx * dx + dy * dy);
 
@@ -132,7 +131,10 @@ function setupDraw() {
 			
 				cx += (dx) * s;
 				cy += (dy) * s;
-			}
+			}*/
+
+			cx = localPlayer.x
+			cy = localPlayer.y
 
 			translate(-cx - 4, -cy - 4);
 		}
@@ -149,11 +151,10 @@ function setupDraw() {
 		for (var y = (cy - height / doubleScale) - cy % 32; y <= cy + height / doubleScale; y += 32) {
 			line(cx - width / doubleScale, y, cx + width / doubleScale, y);
 		}
+		
+		noStroke();
 
 		if (room.data) {
-			stroke(0);
-			strokeWeight(3);
-
 			room.data.forEach((d) => {
 				var x = d[0]
 				var y = d[1]
@@ -161,6 +162,11 @@ function setupDraw() {
 				if (Math.abs(cx - x) > width / SCALE * 0.75 || Math.abs(cy - y) > height / SCALE * 0.75) {
 					return
 				}
+
+				var w = textWidth(d[2])
+
+				fill(0, 0, 0, 255)
+				rect(x - w * 0.5 - 1, y - 13, w + 2, 12)
 
 				var color = d[4]
 
@@ -183,8 +189,6 @@ function setupDraw() {
 
 				text(d[2], x - 32, y - 8, 64);
 			});
-
-			noStroke();
 		}
 	
 		playerArray.forEach((p) => {
@@ -197,8 +201,6 @@ function setupDraw() {
 
 		pop();
 
-		strokeWeight(5);
-		stroke(0);
 		textSize(16)
 		textAlign(LEFT, TOP)
 		

@@ -1,3 +1,6 @@
+var canvas
+var context
+
 const playerAnimations = {
 	idle: {
 		len: 6,
@@ -38,12 +41,17 @@ class Player {
 		this.y = 0;
 		this.message = null;
 		this.messageTimer = 0;
+		this.flip = false;
+		this.sx = 1;
+		this.sy = 1;
+		this.angle = 0;
 	}
 
 	update(dt) {
 		var data = this.getData();
 
 		this.time += dt;
+		this.sx += ((this.flip ? -1 : 1) - this.sx) * dt * 10;
 
 		var dx = data.x - this.x;
 		var dy = data.y - this.y;
@@ -89,15 +97,40 @@ class Player {
 			tint(255);
 		}
 
-		image(assets["player"], this.x, this.y, 8, 8, (Math.floor((this.time * 10) % anim.len) + anim.start) * 8, 0, 8, 8);
+		
+		push();
+		resetMatrix();
+		scale(SCALE);
+		
+		translate(-localPlayer.x + this.x + width / SCALE / 2, -localPlayer.y + this.y + height / SCALE / 2)
+	
+		rotate(this.angle);
+		scale(this.sx, this.sy);
+		image(assets["player"], -4, -4, 8, 8, (Math.floor((this.time * 10) % anim.len) + anim.start) * 8, 0, 8, 8);
+		pop();
 
 		if (this.message) {
-			fill(255);
-			stroke(0);
-			strokeWeight(4);
-			textSize(6);
+			textSize(4);
 			textAlign(CENTER, BOTTOM);
+			
+			var w = textWidth(data.message)
+
+			fill(0, 0, 0, 150);
+			rect(this.x + 4 - w * 0.5, this.y - 2 - 4, w, 4)
+
+			fill(255);
 			text(data.message, this.x + 4, this.y - 2);
+		} else {
+			textSize(4);
+			textAlign(CENTER, BOTTOM);
+			
+			var w = textWidth(data.name)
+			
+			fill(0, 0, 0, 150);
+			rect(this.x + 4 - w * 0.5, this.y - 3 - 3, w, 4)
+
+			fill(255, 255, 255, 100);
+			text(data.name, this.x + 4, this.y - 2);
 		}
 	}
 }
@@ -114,6 +147,7 @@ class LocalPlayer extends Player {
 			this.timer = 0;
 		}
 
+		this.sy += (1 - this.sy) * dt * 10;
 		super.update(dt);
 
 		var dx = 0;
@@ -130,13 +164,16 @@ class LocalPlayer extends Player {
 
 			if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) {
 				dx = -1;
+				this.flip = true;
 			}
 
 			if (keyIsDown(RIGHT_ARROW) || keyIsDown(68)) {
 				dx += 1;
+				this.flip = false;
 			}
 		}
 
+		this.angle += (dx * 0.3 - this.angle) * dt * 10;
 		var data = this.getData();
 
 		if (dx != 0 || dy != 0) {
@@ -148,6 +185,8 @@ class LocalPlayer extends Player {
 			});
 
 			if (data.state != "run") {
+				data.state = "run";
+				this.sy = 2;
 				this.room.send("state", "run");
 			}
 
@@ -159,6 +198,8 @@ class LocalPlayer extends Player {
 			}
 		} else {
 			if (data.state != "idle") {
+				data.state = "idle";
+				this.sy = 0.3;
 				this.room.send("state", "idle");
 			}
 		}

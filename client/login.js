@@ -38,7 +38,6 @@ function loadScript(name) {
 }
 
 var name = getCookie("name")
-console.log(`'${name}'`)
 
 if (name != null && name != "null") {
 	loadScript(P5JS_LINK);
