@@ -200,6 +200,7 @@ export class GameRoom extends Room {
 				var dt = [ player.x + 4, player.y + 4, player.name, message, hashCode(player.name) ];
 
 				data.text.push(dt);
+				console.log(`[message] ${player.name}: ${message}`)
 
 				this.clients.forEach(c => {
 					player = this.state.players[client.sessionId];

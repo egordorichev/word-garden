@@ -1,27 +1,18 @@
 const messages = [
 	"Welcome to this weird place.",
-	"What is it, you ask?",
-	"Well, we are in a time paradox.",
+	"Wwe are in a time paradox.",
 	"You see, Ludum Dare themes\nwere really good in the\nbeginning.",
 	"But with each jam, they\ngot worse and worse.",
 	"People were hoping,\nthat the time will fix it.",
 	"But it never did.",
-	"...",
 	"And this time around, it\ngot so bad, that the time\nhas collapsed on itself.",
 	"And now we all are stuck here,\nin this time loop.",
-	"Forever.",
-	"...",
 	"I even managed to grow a beard!",
 	"They say there are always pluses)",
-	"Anyway, you ask where we are?",
 	"We are nowhere and everywhere,\nat the same time.",
-	"This place is very wild.",
 	"It appears to have nothing\nbut text on the floor.",
 	"And I was even able to\nsome text too.",
 	"You should try doing it\nlater, using SPACE",
-	"Sometimes other people appear",
-	"I've hidden a bunch of messages\naround this place.",
-	"But my internet connection is failing",
 	"See you around!",
 	"baguette"
 ]
@@ -73,6 +64,7 @@ class Npc {
 		} else if (d <= 32) {
 			this.closeEnough = true
 			localPlayer.talking = true
+			localPlayer.talkingTo = this
 
 			this.start()
 		}
@@ -115,12 +107,23 @@ class Npc {
 					assets["talk"].stop();
 					assets["talk"].play(0, Math.max(0.5, Math.min(2, ((c.charCodeAt(0) - 'a'.charCodeAt(0)) / 26) * 1.5) - 0.2));
 				}
-			}, i * 70);
+			}, i * 40);
 		}
 
 		setTimeout(() => {
 			this.doneSaying = true;
-		}, str.length * 70);
+		}, str.length * 40);
+	}
+
+	stopTalking() {
+		localPlayer.talking = false;
+		localPlayer.talkingTo = null
+		this.closeEnough = false;
+		this.farEnough = false;
+		this.text = "";
+		this.step = 0;
+
+		this.finishTalking();
 	}
 
 	sayNext() {
@@ -131,13 +134,7 @@ class Npc {
 			return;
 		}
 
-		localPlayer.talking = false;
-		this.closeEnough = false;
-		this.farEnough = false;
-		this.text = "";
-		this.step = 0;
-
-		this.finishTalking();
+		this.stopTalking();
 	}
 
 	finishTalking() {

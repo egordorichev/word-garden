@@ -213,8 +213,12 @@ document.addEventListener("keydown", (e) => {
 	}
 
 	if (e.code == "Escape") {
-		event.preventDefault();
-		cancel.click();
+		if (localPlayer && localPlayer.talkingTo && localPlayer.talkingTo.sprite != "man") {
+			localPlayer.talkingTo.stopTalking();
+		} else {
+			event.preventDefault();
+			cancel.click();
+		}
 	}
 });
 

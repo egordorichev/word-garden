@@ -163,6 +163,7 @@ class LocalPlayer extends Player {
 	constructor(id, room) {
 		super(id, room);
 		this.timer = -1;
+		this.talkingTo = null;
 	}
 
 	update(dt) {
