@@ -9,16 +9,28 @@ const filter = new Filter();
 const dataPath = 'data/data.json';
 
 var data = JSON.parse(fs.readFileSync(dataPath));
+var activeRoom: GameRoom = null;
 
 function saveData() {
 	fs.writeFileSync(dataPath, JSON.stringify(data));
 }
 
-process.on('exit', saveData.bind(null, {cleanup: true}));
-process.on('SIGINT', saveData.bind(null, {exit: true}));
-process.on('SIGUSR1', saveData.bind(null, {exit: true}));
-process.on('SIGUSR2', saveData.bind(null, {exit: true}));
-process.on('uncaughtException', saveData.bind(null, {exit: true}));
+function cleanup() {
+	console.log("Cleaning up");
+
+	if (activeRoom != null) {
+		activeRoom.cleanup();
+	}
+
+	console.log("Saving data");
+	saveData();
+}
+
+process.on('exit', cleanup.bind(null, {cleanup: true}));
+process.on('SIGINT', cleanup.bind(null, {exit: true}));
+process.on('SIGUSR1', cleanup.bind(null, {exit: true}));
+process.on('SIGUSR2', cleanup.bind(null, {exit: true}));
+process.on('uncaughtException', cleanup.bind(null, {exit: true}));
 
 function hashCode(str: string) {
 	var hash = 0;
@@ -84,6 +96,7 @@ function closeEnough(dt: Array<number|string>, x: number, y: number) {
 }
 
 function say(state: State, message: string, type: string) {
+	console.log(`[${type}] ${message}`);
 	state.chat.push(new ChatLine(message, type));
 
 	if (state.chat.length > 5) {
@@ -104,6 +117,7 @@ export class GameRoom extends Room {
 	players: Array<Player> = new Array<Player>();
 
 	onCreate() {
+		activeRoom = this;
 		this.setState(new State());
 
 		this.onMessage("chat", (client, message) => {
@@ -121,7 +135,6 @@ export class GameRoom extends Room {
 				var player = this.state.players[client.sessionId]
 				player.message = message;
 
-				console.log(`${player.name}: ${message}`);
 				say(this.state, `${player.name}: ${message}`, "regular");
 			} catch (e) {
 				console.log(e)
@@ -249,13 +262,25 @@ export class GameRoom extends Room {
 		}, dt);
 	}
 
-	onLeave(client: Client) {
+	cleanup() {
+		for (var i = 0; i < this.clients.length; i++) {
+			this.clients[i].send("shutdown", "server is down");
+		}
+	}
+
+	async onLeave(client: Client, consented?: boolean) {
 		try {
 			var p = this.state.players[client.sessionId];
-			this.players.splice(this.players.indexOf(p), 1);
 			data.positions[p.name] = [ p.x, p.y ];
 			say(this.state, `${p.name} left`, "server");
 
+			if (!consented) {
+				await this.allowReconnection(client, 60);
+				say(this.state, `${name} joined`, "server");
+				return;
+			}
+
+			this.players.splice(this.players.indexOf(p), 1);
 			delete this.state.players[client.sessionId];
 		} catch (e) {
 			console.log(e)

@@ -10,7 +10,11 @@ var localPlayer;
 var cx = 0;
 var cy = 0;
 
-client.joinOrCreate('room').then(r => {
+function setupConnect(r) {
+	players = new Map();
+	playerArray = [];
+	document.getElementById("chat-container").classList.remove("hidden");
+
 	room = r;
 	room.send("create", getCookie("name") || "undefined");
 
@@ -49,9 +53,31 @@ client.joinOrCreate('room').then(r => {
 		room.data.push(message);
 	});
 
+	room.onMessage("shutdown", message => {
+		room.leave();
+		failConnect(`Socket error code: ${message}`);
+	})
+
+	room.onLeave((code) => {
+		// We left okay
+		if (code == 1000 || code == 1001) {
+			return;
+		}
+
+		failConnect(`Socket error code: ${code}`);
+	})
+
 	setupDraw();
-}).catch(e => {
+}
+
+function tryConnect() {
+	document.getElementById("chat-container").classList.add("hidden");
+	client.joinOrCreate('room').then(setupConnect).catch(failConnect);
+}
+
+function failConnect(e) {
 	console.log(e);
+
 	draw = () => {
 		background(0);
 		fill(255);
@@ -59,9 +85,14 @@ client.joinOrCreate('room').then(r => {
 		textSize(16);
 		textStyle(NORMAL);
 		textAlign(LEFT, TOP);
-		text("Failed to connect to the server", 10, 10);
+
+		text("Failed to connect to the server, attempting to reconnect", 10, 10);
 	};
-});
+
+	setTimeout(tryConnect, 1000);
+}
+
+tryConnect();
 
 var assets = {}
 
