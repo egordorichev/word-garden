@@ -9,6 +9,7 @@ var room;
 var localPlayer;
 var cx = 0;
 var cy = 0;
+var man = null;
 
 function setupConnect(r) {
 	players = new Map();
@@ -30,6 +31,14 @@ function setupConnect(r) {
 			localPlayer = player;
 			cx = player.x;
 			cy = player.y;
+
+			if (getCookie("man") != "baguette") {
+				document.getElementById("chat-container").classList.add("hidden");
+				
+				man = new Man();
+				man.x = cx;
+				man.y = cy - 8;
+			}
 		}
 
 		players.set(sessionId, player);
@@ -106,6 +115,7 @@ function setup() {
 	context.imageSmoothingEnabled = false;
 
 	assets["player"] = loadImage("assets/player.png");
+	assets["man"] = loadImage("assets/man.png");
 }
 
 window.onresize = () => {
@@ -123,11 +133,12 @@ function update() {
 		p.update(deltaTime);
 	});
 
+	man?.update(deltaTime);
 	playerArray.sort((a, b) => a.y > b.y ? 1 : -1);
 }
 
 function keyPressed() {
-	if (room && !room.inputBlocked) {
+	if (room && !(room.inputBlocked || (localPlayer && localPlayer.talking))) {
 		// t or /
 		if (keyCode == 84 || keyCode == 191) {
 			setTimeout(() => {
@@ -149,7 +160,10 @@ function setupDraw() {
 		background(0);
 		scale(SCALE);
 
+		var skip = false
+
 		if (localPlayer) {
+			skip = localPlayer.talking
 			/*var dx = localPlayer.x - cx;
 			var dy = localPlayer.y - cy;
 			var d = Math.sqrt(dx * dx + dy * dy);
@@ -170,93 +184,103 @@ function setupDraw() {
 			translate(-cx - 4, -cy - 4);
 		}
 
-		stroke(100, 100, 100, 25);	
-		strokeWeight(1);
+		if (skip) {
+			localPlayer.render();
+		} else {
+			stroke(100, 100, 100, 25);	
+			strokeWeight(1);
 
-		const doubleScale = 2 * SCALE;
+			const doubleScale = 2 * SCALE;
 
-		for (var x = (cx - width / doubleScale) - cx % 32; x <= cx + 8 + width / doubleScale; x += 32) {
-			line(x, cy - height / doubleScale, x, cy + 8 + height / doubleScale);
-		}
+			for (var x = (cx - width / doubleScale) - cx % 32; x <= cx + 8 + width / doubleScale; x += 32) {
+				line(x, cy - height / doubleScale, x, cy + 8 + height / doubleScale);
+			}
 
-		for (var y = (cy - height / doubleScale) - cy % 32; y <= cy + 8 + height / doubleScale; y += 32) {
-			line(cx - width / doubleScale, y, cx + 8 + width / doubleScale, y);
-		}
+			for (var y = (cy - height / doubleScale) - cy % 32; y <= cy + 8 + height / doubleScale; y += 32) {
+				line(cx - width / doubleScale, y, cx + 8 + width / doubleScale, y);
+			}
+			
+			noStroke();
+
+			if (room.data) {
+				room.data.forEach((d) => {
+					var x = d[0]
+					var y = d[1]
+
+					if (Math.abs(cx - x) > width / SCALE * 0.75 || Math.abs(cy - y) > height / SCALE * 0.75) {
+						return
+					}
+
+					var w = textWidth(d[2])
+
+					fill(0, 0, 0, 255)
+					rect(x - w * 0.5 - 1, y - 13, w + 2, 12)
+
+					var color = d[4]
+
+					if (color) {
+						color = playerColors[figureOutColor(color, playerColors.length)]
+						fill(color[0], color[1], color[2]);
+					} else {
+						fill(255);
+					}
+
+					textSize(4);
+					textAlign(CENTER, BOTTOM);
+					text(d[3], x - 32, y - 2, 64);
+
+					if (color) {
+						fill(color[0] * 0.5, color[1] * 0.5, color[2] * 0.5);
+					} else {
+						fill(200);
+					}
+
+					text(d[2], x - 32, y - 8, 64);
+				});
+			}
 		
-		noStroke();
-
-		if (room.data) {
-			room.data.forEach((d) => {
-				var x = d[0]
-				var y = d[1]
-
-				if (Math.abs(cx - x) > width / SCALE * 0.75 || Math.abs(cy - y) > height / SCALE * 0.75) {
+			playerArray.forEach((p) => {
+				if (Math.abs(p.x - cx) > width / SCALE * 0.75 || Math.abs(p.y - cy) > height / SCALE * 0.75) {
 					return
 				}
 
-				var w = textWidth(d[2])
-
-				fill(0, 0, 0, 255)
-				rect(x - w * 0.5 - 1, y - 13, w + 2, 12)
-
-				var color = d[4]
-
-				if (color) {
-					color = playerColors[figureOutColor(color, playerColors.length)]
-					fill(color[0], color[1], color[2]);
-				} else {
-					fill(255);
-				}
-
-				textSize(4);
-				textAlign(CENTER, BOTTOM);
-				text(d[3], x - 32, y - 2, 64);
-
-				if (color) {
-					fill(color[0] * 0.5, color[1] * 0.5, color[2] * 0.5);
-				} else {
-					fill(200);
-				}
-
-				text(d[2], x - 32, y - 8, 64);
+				p.render();
 			});
 		}
-	
-		playerArray.forEach((p) => {
-			if (Math.abs(p.x - cx) > width / SCALE * 0.75 || Math.abs(p.y - cy) > height / SCALE * 0.75) {
-				return
-			}
 
-			p.render();
-		});
-
-		pop();
-
-		textSize(16)
-		textAlign(LEFT, TOP)
-		
-		fill(255);
-
-		for (var i = 0; i < room.state.chat.length; i++) {
-			var message = room.state.chat[i]
-
-			if (message.type != "regular") {
-				fill(playerColors[5]);
-			}
-
-			text(message.line, 10, height - (room.state.chat.length - i - 1) * 20 - 60);	
-
-			if (message.type != "regular") {
-				fill(255);
-			}
+		if (man != null && !(Math.abs(man.x - cx) > width / SCALE * 0.75 || Math.abs(man.y - cy) > height / SCALE * 0.75)) {
+			man.render();
 		}
 
-		fill(100);
-		text(`${playerArray.length} online`, 10, 10)
+		if (!skip) {
+			pop();
 
-		if (localPlayer) {
-			fill(80)
-			text(`${Math.floor(localPlayer.x / 32)}:${Math.floor(localPlayer.y / 32)}`, 10, 30)
+			textSize(16)
+			textAlign(LEFT, TOP)
+			
+			fill(255);
+
+			for (var i = 0; i < room.state.chat.length; i++) {
+				var message = room.state.chat[i]
+
+				if (message.type != "regular") {
+					fill(playerColors[5]);
+				}
+
+				text(message.line, 10, height - (room.state.chat.length - i - 1) * 20 - 60);	
+
+				if (message.type != "regular") {
+					fill(255);
+				}
+			}
+
+			fill(100);
+			text(`${playerArray.length} online`, 10, 10)
+
+			if (localPlayer) {
+				fill(80)
+				text(`${Math.floor(localPlayer.x / 32)}:${Math.floor(localPlayer.y / 32)}`, 10, 30)
+			}
 		}
 	}
 }
@@ -282,7 +306,7 @@ input.addEventListener("keyup", (event) => {
 });
 
 button.addEventListener("click", () => {
-	if (room.inputBlocked) {
+	if (room.inputBlocked || (localPlayer && localPlayer.talking)) {
 		return;
 	}
 
@@ -319,8 +343,8 @@ function ttrim() {
 }
 
 messsageArea.addEventListener("input", ttrim);
-messsageArea.addEventListener("paste", ttrim);
 messsageArea.addEventListener("change", ttrim);
+messsageArea.addEventListener("paste", e => e.preventDefault());
 
 leaveMessage.addEventListener("click", () => {
 	if (!room.inputBlocked) {

@@ -60,8 +60,8 @@ class Player extends Schema {
 
 		name = name.substring(0, 32);
 
-		this.x = Math.random() * 128 - 64;
-		this.y = Math.random() * 128 - 64;
+		this.x = Math.random() * 16 - 8;
+		this.y = Math.random() * 16 - 8;
 		this.message = null;
 		this.name = name;
 		this.color = hashCode(this.name);
@@ -268,17 +268,11 @@ export class GameRoom extends Room {
 		}
 	}
 
-	async onLeave(client: Client, consented?: boolean) {
+	onLeave(client: Client) {
 		try {
 			var p = this.state.players[client.sessionId];
 			data.positions[p.name] = [ p.x, p.y ];
 			say(this.state, `${p.name} left`, "server");
-
-			if (!consented) {
-				await this.allowReconnection(client, 60);
-				say(this.state, `${name} joined`, "server");
-				return;
-			}
 
 			this.players.splice(this.players.indexOf(p), 1);
 			delete this.state.players[client.sessionId];

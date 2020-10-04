@@ -39,12 +39,15 @@ class Player {
 		
 		this.x = 0;
 		this.y = 0;
+		this.text = ""
 		this.message = null;
 		this.messageTimer = 0;
 		this.flip = false;
 		this.sx = 1;
 		this.sy = 1;
 		this.angle = 0;
+		this.talking = false;
+		this.wasTalking = false;
 	}
 
 	update(dt) {
@@ -69,7 +72,9 @@ class Player {
 
 		if (data.message != this.message) {
 			this.message = data.message;
-			this.messageTimer = 3;
+			this.messageTimer = 5;
+
+			this.say(this.message)
 		}
 
 		if (this.message) {
@@ -79,6 +84,18 @@ class Player {
 				this.message = null;
 				data.message = null;
 			}
+		}
+	}
+
+	say(str) {
+		this.text = ""
+
+		for (var i = 0; i < str.length; i++) {
+			let c = str.charAt(i);
+
+			setTimeout(() => {
+				this.text += c
+			}, i * 50);
 		}
 	}
 
@@ -113,13 +130,13 @@ class Player {
 			textSize(4);
 			textAlign(CENTER, BOTTOM);
 			
-			var w = textWidth(data.message)
+			var w = textWidth(this.text)
 
 			fill(0, 0, 0, 150);
 			rect(this.x + 4 - w * 0.5, this.y - 2 - 4, w, 4)
 
 			fill(255);
-			text(data.message, this.x + 4, this.y - 2);
+			text(this.text, this.x + 4, this.y - 2);
 		} else {
 			textSize(4);
 			textAlign(CENTER, BOTTOM);
@@ -153,7 +170,7 @@ class LocalPlayer extends Player {
 		var dx = 0;
 		var dy = 0;
 
-		if (!this.room.inputBlocked) {
+		if (!this.room.inputBlocked && !this.talking) {
 			if (keyIsDown(UP_ARROW) || keyIsDown(87)) {
 				dy = -1;
 			}
@@ -176,9 +193,11 @@ class LocalPlayer extends Player {
 		this.angle += (dx * 0.3 - this.angle) * dt * 10;
 		var data = this.getData();
 
-		if (data.dx != dx || data.dy != dy) {
+		if (data.dx != dx || data.dy != dy || this.wasTalking != this.talking) {
 			this.room.send("keys", [ dx, dy ]);
 		}
+
+		this.wasTalking = this.talking
 
 		if (dx != 0 || dy != 0) {
 			var s = deltaTime * 60;
