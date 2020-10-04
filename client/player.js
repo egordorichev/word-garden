@@ -176,13 +176,12 @@ class LocalPlayer extends Player {
 		this.angle += (dx * 0.3 - this.angle) * dt * 10;
 		var data = this.getData();
 
+		if (data.dx != dx || data.dy != dy) {
+			this.room.send("keys", [ dx, dy ]);
+		}
+
 		if (dx != 0 || dy != 0) {
 			var s = deltaTime * 60;
-
-			this.room.send("move", { 
-				x: dx * s,
-				y: dy * s
-			});
 
 			if (data.state != "run") {
 				data.state = "run";

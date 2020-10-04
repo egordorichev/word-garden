@@ -144,12 +144,12 @@ function setupDraw() {
 
 		const doubleScale = 2 * SCALE;
 
-		for (var x = (cx - width / doubleScale) - cx % 32; x <= cx + width / doubleScale; x += 32) {
-			line(x, cy - height / doubleScale, x, cy + height / doubleScale);
+		for (var x = (cx - width / doubleScale) - cx % 32; x <= cx + 8 + width / doubleScale; x += 32) {
+			line(x, cy - height / doubleScale, x, cy + 8 + height / doubleScale);
 		}
 
-		for (var y = (cy - height / doubleScale) - cy % 32; y <= cy + height / doubleScale; y += 32) {
-			line(cx - width / doubleScale, y, cx + width / doubleScale, y);
+		for (var y = (cy - height / doubleScale) - cy % 32; y <= cy + 8 + height / doubleScale; y += 32) {
+			line(cx - width / doubleScale, y, cx + 8 + width / doubleScale, y);
 		}
 		
 		noStroke();

@@ -40,6 +40,8 @@ class Player extends Schema {
 	@type("string") message: string;
 	@type("string") name: string;
 	@type("string") currentState: string;
+	@type("number") dx: number;
+	@type("number") dy: number;
 
 	constructor(name: string) {
 		super();
@@ -52,6 +54,8 @@ class Player extends Schema {
 		this.name = name;
 		this.color = hashCode(this.name);
 		this.currentState = "idle";
+		this.dx = 0;
+		this.dy = 0;
 	}
 }
 
@@ -97,19 +101,10 @@ function say(state: State, message: string, type: string) {
 }
 
 export class GameRoom extends Room {
+	players: Array<Player> = new Array<Player>();
+
 	onCreate() {
 		this.setState(new State());
-
-		this.onMessage("move", (client, message) => {
-			try {
-				var player = this.state.players[client.sessionId]
-				
-				player.x += message.x;
-				player.y += message.y;
-			} catch (e) {
-				console.log(e)
-			}
-		});
 
 		this.onMessage("chat", (client, message) => {
 			try {
@@ -209,6 +204,8 @@ export class GameRoom extends Room {
 				}
 
 				var p = new Player(name);
+
+				this.players.push(p);
 				this.state.players[client.sessionId] = p;
 
 				var position = data.positions[name];
@@ -223,11 +220,39 @@ export class GameRoom extends Room {
 				console.log(e)
 			}
 		});
+
+		this.onMessage("keys", (client, state) => {
+			try {
+				if (typeof state[0] !== "number" || typeof state[0] !== "number") {
+					return;
+				}
+
+				var player = this.state.players[client.sessionId]
+				
+				player.dx = Math.min(1, Math.max(-1, state[0]));
+				player.dy = Math.min(1, Math.max(-1, state[1]));
+			} catch (e) {
+				console.log(e)
+			}
+		});
+
+		const dt = 1000 / 20;
+
+		setInterval(() => {
+			const s = dt * 0.1;
+
+			for (var i = 0; i < this.players.length; i++) {
+				var player = this.players[i];
+				player.x += player.dx * s;
+				player.y += player.dy * s;
+			}
+		}, dt);
 	}
 
 	onLeave(client: Client) {
 		try {
 			var p = this.state.players[client.sessionId];
+			this.players.splice(this.players.indexOf(p), 1);
 			data.positions[p.name] = [ p.x, p.y ];
 			say(this.state, `${p.name} left`, "server");
 
