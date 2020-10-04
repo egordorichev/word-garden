@@ -10,6 +10,7 @@ var localPlayer;
 var cx = 0;
 var cy = 0;
 var man = null;
+var timeLeft = 0;
 
 function setupConnect(r) {
 	players = new Map();
@@ -34,7 +35,7 @@ function setupConnect(r) {
 
 			if (getCookie("man") != "baguette") {
 				document.getElementById("chat-container").classList.add("hidden");
-				
+
 				man = new Man();
 				man.x = cx;
 				man.y = cy - 8;
@@ -123,11 +124,19 @@ window.onresize = () => {
 }
 
 function update() {
+	deltaTime /= 1000;
+
+	if (timeLeft > 0) {
+		timeLeft -= deltaTime;
+
+		if (timeLeft < 0) {
+			timeLeft = 0;
+		}
+	}
+
 	if (room == undefined) {
 		return;
 	}
-
-	deltaTime /= 1000;
 
 	playerArray.forEach((p) => {
 		p.update(deltaTime);
@@ -137,18 +146,22 @@ function update() {
 	playerArray.sort((a, b) => a.y > b.y ? 1 : -1);
 }
 
-function keyPressed() {
+document.addEventListener("keydown", (e) => {
 	if (room && !(room.inputBlocked || (localPlayer && localPlayer.talking))) {
-		// t or /
-		if (keyCode == 84 || keyCode == 191) {
-			setTimeout(() => {
-				input.focus();
-			}, 1);
-		} else if (keyCode == 32) {
+		if (e.code == "t" || e.code == "/") {
+			input.focus();
+			e.preventDefault();
+		} else if (e.code == "Space") {
 			setModalEnabled(true);
+			e.preventDefault();
 		}
 	}
-}
+
+	if (e.code == "Escape") {
+		event.preventDefault();
+		cancel.click();
+	}
+});
 
 function setupDraw() {
 	draw = () => {
@@ -326,6 +339,8 @@ function setModalEnabled(enabled) {
 	if (enabled) {
 		o.classList.remove("hidden");
 		c.classList.add("blurred");
+		messsageArea.focus();
+		messsageArea.value = "";
 	} else {
 		o.classList.add("hidden");
 		c.classList.remove("blurred");
@@ -347,12 +362,28 @@ messsageArea.addEventListener("change", ttrim);
 messsageArea.addEventListener("paste", e => e.preventDefault());
 
 leaveMessage.addEventListener("click", () => {
-	if (!room.inputBlocked) {
+	if (!room.inputBlocked || timeLeft > 0) {
 		return;
 	}
 
 	if (room != undefined && /\S/.test(messsageArea.value) && messsageArea.value.length <= 256) {
 		room.send("message", messsageArea.value);
+		timeLeft = 60;
+		document.getElementById("cap").classList.remove("hidden")
+			
+		for (let i = 0; i < timeLeft; i++) {
+			setTimeout(() => {
+				document.getElementById("cap-time").innerHTML = Math.ceil(timeLeft);
+			}, i * 1000);
+		}
+
+		setTimeout(() => {
+			if (timeLeft <= 0) {
+				document.getElementById("cap").classList.add("hidden")
+			}
+		}, timeLeft * 1000);
+
+		
 	}
 
 	messsageArea.value = "";
@@ -363,7 +394,6 @@ cancel.addEventListener("click", () => {
 	if (!room.inputBlocked) {
 		return;
 	}
-
 
 	messsageArea.value = "";
 	setModalEnabled(false);

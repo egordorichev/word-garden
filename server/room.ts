@@ -5,6 +5,17 @@ import { Schema, ArraySchema, MapSchema, type } from "@colyseus/schema";
 
 const Filter = require('bad-words');
 const filter = new Filter();
+const regex = new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?", "g")
+
+function filterContent(str: string) {
+	try {
+		str = filter.clean(str)
+	} catch (e) {
+		console.log(e)
+	}
+
+	return str.replace(regex, "baguette")
+}
 
 const dataPath = 'data/data.json';
 
@@ -127,7 +138,7 @@ export class GameRoom extends Room {
 				}
 
 				try {
-					message = filter.clean(message);
+					message = filterContent(message);
 				} catch (e) {
 					console.log(e)
 				}
@@ -180,7 +191,7 @@ export class GameRoom extends Room {
 				}
 
 				try {
-					message = filter.clean(message);
+					message = filterContent(message);
 				} catch (e) {
 					console.log(e)
 				}
@@ -211,7 +222,7 @@ export class GameRoom extends Room {
 				}
 
 				try {
-					name = filter.clean(name);
+					name = filterContent(name);
 				} catch (e) {
 					console.log(e)
 				}

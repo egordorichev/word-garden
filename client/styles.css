@@ -21,6 +21,7 @@ canvas {
 }
 
 .blurred {
+	-webkit-filter: blur(2px);
 	filter: blur(2px);
 }
 
@@ -177,5 +178,15 @@ h3 {
 
 #controls {
 	font-family: 'Sansita Swashed', cursive;
+	color: #bbb;
+}
+
+#cap {
+	margin-left: 5pt;
+	font-size: 10pt;
+	font-family: 'Sansita Swashed', cursive;
+}
+
+#cap-time{ 
 	color: #bbb;
 }
