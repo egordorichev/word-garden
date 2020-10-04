@@ -123,6 +123,8 @@ var assets = {}
 function preload() {
 	soundFormats('wav');
 	assets["talk"] = loadSound("assets/talk.wav");
+	assets["open"] = loadSound("assets/open.wav");
+	assets["close"] = loadSound("assets/close.wav");
 }
 
 function setup() {
@@ -346,6 +348,7 @@ button.addEventListener("click", () => {
 
 	if (room != undefined && /\S/.test(input.value) > 0 && input.value.length <= 256) {
 		room.send("chat", input.value);
+		assets["open"].play();
 	}
 
 	input.value = "";
@@ -362,9 +365,11 @@ function setModalEnabled(enabled) {
 		c.classList.add("blurred");
 		messsageArea.focus();
 		messsageArea.value = "";
+		assets["open"].play();
 	} else {
 		o.classList.add("hidden");
 		c.classList.remove("blurred");
+		assets["close"].play();
 	}
 }
 

@@ -1,12 +1,5 @@
 * music (ambience)
 
-* sound effects {
-	* talking sound
-	* steps sound?
-	* opening/closing message dialog
-	* message in chat appearing (probs will have to cap that tho idk)
-}
-
 * some props or smth to make the world more interesting
 
 * easter eggs {
