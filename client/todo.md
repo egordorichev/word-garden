@@ -1,4 +1,3 @@
-* player gets a message every 60 seconds
 * music (ambience)
 
 * sound effects {

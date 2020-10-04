@@ -12,6 +12,20 @@ var cy = 0;
 var man = null;
 var timeLeft = 0;
 
+var t = getCookie("timer");
+
+if (typeof(t) == "string") {
+	try {
+		timeLeft = Math.max(0, 60 - (new Date() - new Date(t)) / 1000)
+	} catch (e) {
+		timeLeft = 60
+	}
+
+	if (timeLeft > 0) {
+		showTime()
+	}
+}
+
 function setupConnect(r) {
 	players = new Map();
 	playerArray = [];
@@ -361,6 +375,22 @@ messsageArea.addEventListener("input", ttrim);
 messsageArea.addEventListener("change", ttrim);
 messsageArea.addEventListener("paste", e => e.preventDefault());
 
+function showTime() {
+	document.getElementById("cap").classList.remove("hidden")
+	
+for (let i = 0; i < timeLeft; i++) {
+	setTimeout(() => {
+		document.getElementById("cap-time").innerHTML = Math.ceil(timeLeft);
+	}, i * 1000);
+}
+
+setTimeout(() => {
+	if (timeLeft <= 0) {
+		document.getElementById("cap").classList.add("hidden")
+	}
+}, timeLeft * 1000);
+}
+
 leaveMessage.addEventListener("click", () => {
 	if (!room.inputBlocked || timeLeft > 0) {
 		return;
@@ -369,21 +399,9 @@ leaveMessage.addEventListener("click", () => {
 	if (room != undefined && /\S/.test(messsageArea.value) && messsageArea.value.length <= 256) {
 		room.send("message", messsageArea.value);
 		timeLeft = 60;
-		document.getElementById("cap").classList.remove("hidden")
-			
-		for (let i = 0; i < timeLeft; i++) {
-			setTimeout(() => {
-				document.getElementById("cap-time").innerHTML = Math.ceil(timeLeft);
-			}, i * 1000);
-		}
-
-		setTimeout(() => {
-			if (timeLeft <= 0) {
-				document.getElementById("cap").classList.add("hidden")
-			}
-		}, timeLeft * 1000);
-
 		
+		setCookie("timer", new Date());
+		showTime()
 	}
 
 	messsageArea.value = "";

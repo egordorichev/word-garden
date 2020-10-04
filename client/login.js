@@ -49,9 +49,9 @@ if (name != null && name != "null") {
 	document.getElementById("overlay-message").classList.add("hidden")
 
 	var input = document.getElementById("nick")
-	var join = document.getElementById("join")
+	var jjoin = document.getElementById("join")
 
-	join.addEventListener("click", () => {
+	jjoin.addEventListener("click", () => {
 		if (/\S/.test(input.value) && input.value.length < 32) {
 			setCookie("name", input.value);
 
@@ -69,7 +69,7 @@ if (name != null && name != "null") {
 	nick.addEventListener("keyup", (event) => {
 		if (event.keyCode === 13) {
 			event.preventDefault();
-			join.click();
+			jjoin.click();
 		}
 	});
 }
