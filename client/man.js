@@ -32,6 +32,7 @@ class Npc {
 		this.y = 0
 		this.time = 0
 		this.closeEnough = false
+		this.farEnough = true
 		this.text = ""
 		this.step = 0;
 		this.sprite = "player"
@@ -65,7 +66,11 @@ class Npc {
 
 		var d = Math.sqrt(dx * dx + dy * dy);
 
-		if (d <= 32) {
+		if (!this.farEnough) {
+			if (d >= 64) {
+				this.farEnough = true;
+			}
+		} else if (d <= 32) {
 			this.closeEnough = true
 			localPlayer.talking = true
 
@@ -73,11 +78,13 @@ class Npc {
 		}
 	}
 
-	render() {
-		colorMode(HSB)
-		tint(this.time * 100 % 360, 100, 100);
+	drawSprite() {
+		tint(255)
 		image(assets[this.sprite], this.x, this.y, 8, 8, (Math.floor(this.time * 7) % 5) * 8, 0, 8, 8);
-		colorMode(RGB)
+	}
+
+	render() {
+		this.drawSprite();
 
 		if (this.closeEnough) {
 			textSize(4);
@@ -125,6 +132,11 @@ class Npc {
 		}
 
 		localPlayer.talking = false;
+		this.closeEnough = false;
+		this.farEnough = false;
+		this.text = "";
+		this.step = 0;
+
 		this.finishTalking();
 	}
 
@@ -160,15 +172,67 @@ class Man extends Npc {
 		}, 5000);
 	}
 
+	drawSprite() {
+		colorMode(HSB)
+		tint(this.time * 100 % 360, 100, 100);
+		image(assets[this.sprite], this.x, this.y, 8, 8, (Math.floor(this.time * 7) % 5) * 8, 0, 8, 8);
+		colorMode(RGB)
+		tint(255)
+	}
+
 	update(dt) {
 		super.update(dt)
 
 		if (!localPlayer) {
 			return;
 		} else if (!this.set) {
-			this.x = localPlayer.x - 4
+			this.x = localPlayer.x
 			this.y = localPlayer.y - 30
 			this.set = true
 		}
+	}
+}
+
+const baguetteMessages = [
+	"Baguette!",
+	"!",
+	"Yeah, silly, I know",
+	"Egor was too tired to think\nof anything at this point",
+	"But at least I exist",
+	"Right?",
+	"I hope?",
+	"..."
+]
+
+class Baguette extends Npc {
+	constructor() {
+		super()
+
+		this.messages = baguetteMessages
+		this.sprite = "baguette"
+	}
+
+	start() {
+		this.say(`Sup, ${localPlayer.getData().name}!`)
+	}
+}
+
+
+const dinoMessages = [
+	"I hope you are having fun!",
+	"This is made by @egordorichev",
+	"..."
+]
+
+class Dino extends Npc {
+	constructor() {
+		super()
+
+		this.messages = dinoMessages
+		this.sprite = "dino"
+	}
+
+	start() {
+		this.say(`Pssst!`)
 	}
 }

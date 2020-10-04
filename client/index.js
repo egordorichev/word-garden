@@ -11,6 +11,7 @@ var cx = 0;
 var cy = 0;
 var man = null;
 var timeLeft = 0;
+var npc = [];
 
 var t = getCookie("timer");
 
@@ -26,9 +27,16 @@ if (typeof(t) == "string") {
 	}
 }
 
+function addNpc(n, x, y) {
+	n.x = x
+	n.y = y
+	npc.push(n)
+}
+
 function setupConnect(r) {
 	players = new Map();
 	playerArray = [];
+	npc = [];
 	document.getElementById("chat-container").classList.remove("hidden");
 
 	room = r;
@@ -47,13 +55,16 @@ function setupConnect(r) {
 			cx = player.x;
 			cy = player.y;
 
-			if (false && getCookie("man") != "baguette") {
+			if (getCookie("man") != "baguette") {
 				document.getElementById("chat-container").classList.add("hidden");
 
 				man = new Man();
 				man.x = cx;
 				man.y = cy - 8;
 			}
+
+			addNpc(new Baguette(), 128, 128);
+			addNpc(new Dino(), -256, 64)
 		}
 
 		players.set(sessionId, player);
@@ -144,6 +155,8 @@ function setup() {
 
 	assets["player"] = loadImage("assets/player.png");
 	assets["man"] = loadImage("assets/man.png");
+	assets["dino"] = loadImage("assets/dino.png");
+	assets["baguette"] = loadImage("assets/baguette.png");
 }
 
 function playSoundtrack() {
@@ -177,6 +190,10 @@ function update() {
 	}
 
 	playerArray.forEach((p) => {
+		p.update(deltaTime);
+	});
+
+	npc.forEach((p) => {
 		p.update(deltaTime);
 	});
 
@@ -302,6 +319,14 @@ function setupDraw() {
 		if (man != null && !(Math.abs(man.x - cx) > width / SCALE * 0.75 || Math.abs(man.y - cy) > height / SCALE * 0.75)) {
 			man.render();
 		}
+
+		npc.forEach((p) => {
+			if (Math.abs(p.x - cx) > width / SCALE * 0.75 || Math.abs(p.y - cy) > height / SCALE * 0.75) {
+				return
+			}
+
+			p.render();
+		});
 
 		if (!skip) {
 			pop();

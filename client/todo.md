@@ -1,8 +1,5 @@
-* easter eggs {
-	* dino somewhere saying a link to the blog
-	* baguette npc (literal baguette)
-}
-
-* game isnt working on the first load
+* make interesting place
 * minify js before posting
-* juice, particles etc
+* timelapse mount
+* submit the game
+* don't shutdown (leave the server on auto restart thing from npm)
