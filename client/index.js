@@ -121,10 +121,16 @@ tryConnect();
 var assets = {}
 
 function preload() {
-	soundFormats('wav');
+	soundFormats('wav', 'mp3');
+
 	assets["talk"] = loadSound("assets/talk.wav");
 	assets["open"] = loadSound("assets/open.wav");
 	assets["close"] = loadSound("assets/close.wav");
+
+	// Aka not in dev mode
+	if (HOST != "localhost") {
+		assets["music"] = loadSound("assets/ld47.mp3", playSoundtrack);
+	}
 }
 
 function setup() {
@@ -138,6 +144,15 @@ function setup() {
 
 	assets["player"] = loadImage("assets/player.png");
 	assets["man"] = loadImage("assets/man.png");
+}
+
+function playSoundtrack() {
+	setTimeout(() => {
+		var music = assets["music"];
+	
+		music.play();
+		music.loop();
+	}, 10000)
 }
 
 window.onresize = () => {

@@ -1,5 +1,3 @@
-* music (ambience)
-
 * easter eggs {
 	* dino somewhere saying a link to the blog
 	* baguette npc (literal baguette)

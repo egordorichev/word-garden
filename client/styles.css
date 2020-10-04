@@ -190,3 +190,8 @@ h3 {
 #cap-time{ 
 	color: #bbb;
 }
+
+#p5_loading {
+	padding: 10pt;
+	font-family: 'Sansita Swashed', cursive;
+}
