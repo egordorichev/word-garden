@@ -1,1 +1,0 @@
-* minify js before posting
