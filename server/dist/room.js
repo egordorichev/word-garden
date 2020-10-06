@@ -226,6 +226,7 @@ var GameRoom = /** @class */ (function (_super) {
                 var player = _this.state.players[client.sessionId];
                 var dt = [player.x + 4, player.y + 4, player.name, message, hashCode(player.name)];
                 data.text.push(dt);
+                console.log("[message] " + player.name + ": " + message);
                 _this.clients.forEach(function (c) {
                     player = _this.state.players[client.sessionId];
                     if (closeEnough(dt, player.x + 4, player.y + 4)) {

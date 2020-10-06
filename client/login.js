@@ -35,45 +35,47 @@ function loadScript(name) {
 	document.head.appendChild(script);
 }
 
-var name = getCookie("name")
-var tryConnect;
-
-function loadLibs() {
-	setTimeout(() => {
-		tryConnect();
-	}, 1)
-}
-
-if (name != null && name != "null") {
-	loadLibs();
-} else {
-	document.getElementById("chat-container").classList.add("hidden")
-	document.getElementById("overlay").classList.remove("hidden")
-	document.getElementById("overlay-login").classList.remove("hidden")
-	document.getElementById("overlay-message").classList.add("hidden")
-
-	let input = document.getElementById("nick")
-	let jjoin = document.getElementById("join")
-
-	jjoin.addEventListener("click", () => {
-		console.log(input.value)
-		if (/\S/.test(input.value) && input.value.length < 32) {
-			setCookie("name", input.value);
-
-			document.getElementById("chat-container").classList.remove("hidden")
-			document.getElementById("overlay").classList.add("hidden")
-			document.getElementById("overlay-login").classList.add("hidden")
-			document.getElementById("overlay-message").classList.remove("hidden")
-
-			loadLibs();
-			return;
-		}
-	});
-
-	nick.addEventListener("keyup", (event) => {
-		if (event.keyCode === 13) {
-			event.preventDefault();
-			jjoin.click();
-		}
-	});
+window.onload = () => {
+    var name = getCookie("name")
+    var tryConnect;
+    
+    function loadLibs() {
+    	setTimeout(() => {
+    		tryConnect();
+    	}, 1)
+    }
+    
+    if (name != null && name != "null") {
+    	loadLibs();
+    } else {
+    	document.getElementById("chat-container").classList.add("hidden")
+    	document.getElementById("overlay").classList.remove("hidden")
+    	document.getElementById("overlay-login").classList.remove("hidden")
+    	document.getElementById("overlay-message").classList.add("hidden")
+    
+    	let input = document.getElementById("nick")
+    	let jjoin = document.getElementById("join")
+    
+    	jjoin.addEventListener("click", () => {
+    		console.log(input.value)
+    		if (/\S/.test(input.value) && input.value.length < 32) {
+    			setCookie("name", input.value);
+    
+    			document.getElementById("chat-container").classList.remove("hidden")
+    			document.getElementById("overlay").classList.add("hidden")
+    			document.getElementById("overlay-login").classList.add("hidden")
+    			document.getElementById("overlay-message").classList.remove("hidden")
+    
+    			loadLibs();
+    			return;
+    		}
+    	});
+    
+    	nick.addEventListener("keyup", (event) => {
+    		if (event.keyCode === 13) {
+    			event.preventDefault();
+    			jjoin.click();
+    		}
+    	});
+    }   
 }
